@@ -3263,6 +3263,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Salt
       objectReference: {fileID: 0}
+    - target: {fileID: 4503658764794008260, guid: 8cb2c78f686379b45af4048c06368728, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

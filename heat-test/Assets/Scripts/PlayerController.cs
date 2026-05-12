@@ -49,15 +49,15 @@ public class PlayerController : MonoBehaviour
         else
             Destroy(gameObject);
 
-        //if (!hasDrill)
-        //{
-        //    drill.SetActive(false);
-        //}
+        if (!hasDrill)
+        {
+            drill.SetActive(false);
+        }
 
-        //if (!hasPick)
-        //{
-        //    pick.SetActive(false);
-        //}
+        if (!hasPick)
+        {
+            pick.SetActive(false);
+        }
     }
 
     void Start()
