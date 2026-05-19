@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public GameObject drill;
     [SerializeField] public bool hasPick = false;
     [SerializeField] public GameObject pick;
+    [SerializeField] public Light flame;
 
     private CharacterController controller;
     private Vector3 moveInput;
@@ -126,7 +128,7 @@ public class PlayerController : MonoBehaviour
             progress.Decrease(Time.deltaTime * moveHeatMod);
         }
 
-
+        updateLight();
         
     }
 
@@ -166,5 +168,11 @@ public class PlayerController : MonoBehaviour
 
 
         }
+    }
+
+    void updateLight()
+    {
+        flame.intensity = (progress.CurrentValue / progress.maxValue) * 50;
+        flame.range = (progress.CurrentValue / progress.maxValue) * 50;
     }
 }
