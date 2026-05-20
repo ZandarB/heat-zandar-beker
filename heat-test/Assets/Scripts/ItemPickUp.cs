@@ -5,7 +5,7 @@ public class ItemPickUp : MonoBehaviour
     [SerializeField] public bool isDrill;
     [SerializeField] public bool isPick;
 
-    // Use OnTriggerEnter — works with CharacterController
+    // Use OnTriggerEnter ï¿½ works with CharacterController
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))

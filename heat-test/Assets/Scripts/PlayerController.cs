@@ -142,6 +142,7 @@ public class PlayerController : MonoBehaviour
         //Pick up coal
         if (other.gameObject.CompareTag("Coal") && hasPick == true)
         {
+            AudioController.Instance.PlaySound("oreMining");
             Debug.Log("Coal tag works");
             coalNum += coalIncrement;
             coalController.totalCoal -= coalIncrement;
@@ -150,6 +151,7 @@ public class PlayerController : MonoBehaviour
         //Pick up salt
         if (other.gameObject.CompareTag("Salt") && hasPick == true)
         {
+            AudioController.Instance.PlaySound("oreMining");
             Debug.Log("Salt tag works");
             saltNum += saltIncrement;
             saltController.totalSalt -= saltIncrement;
@@ -162,7 +164,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Furance tag works");
             if (coalNum > 0)
             {
-                //AudioController.Instance.PlaySound("furnaceEnter");
+                AudioController.Instance.PlaySound("furnaceEnter");
                 Debug.Log("Player has coal");
                 progress.maxValue += coalNum;
                 progress.ResetBar();

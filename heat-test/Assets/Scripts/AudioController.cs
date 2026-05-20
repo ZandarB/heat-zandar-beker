@@ -8,6 +8,7 @@ public class AudioController : MonoBehaviour
 
     [SerializeField] private AudioClip furnaceEnter;
     [SerializeField] private AudioClip playerJump;
+    [SerializeField] private AudioClip oreMining;
     
     void Awake()
     {
@@ -26,11 +27,14 @@ public class AudioController : MonoBehaviour
     {
         switch (soundType)
         {
-            case "FurnaceEnter":
+            case "furnaceEnter":
                 audioSource.PlayOneShot(furnaceEnter);
                 break;
             case "playerJump":
                 audioSource.PlayOneShot(playerJump);
+                break;
+             case "oreMining":
+                audioSource.PlayOneShot(oreMining);
                 break;
 
             default:
