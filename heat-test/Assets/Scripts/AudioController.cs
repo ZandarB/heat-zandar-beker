@@ -6,9 +6,14 @@ public class AudioController : MonoBehaviour
     public static AudioController Instance;
     [SerializeField] private AudioSource audioSource;
 
+    // Ambience
+    [SerializeField] private AudioClip furnaceRoom;
+
+    // Sound Effects
     [SerializeField] private AudioClip furnaceEnter;
     [SerializeField] private AudioClip playerJump;
     [SerializeField] private AudioClip oreMining;
+    [SerializeField] private AudioClip picPickup;
     
     void Awake()
     {
@@ -27,6 +32,12 @@ public class AudioController : MonoBehaviour
     {
         switch (soundType)
         {
+            // Ambience
+            case "furnaceRoom":
+                audioSource.PlayOneShot(furnaceRoom);
+                break;
+
+            // Effects
             case "furnaceEnter":
                 audioSource.PlayOneShot(furnaceEnter);
                 break;
@@ -35,6 +46,9 @@ public class AudioController : MonoBehaviour
                 break;
              case "oreMining":
                 audioSource.PlayOneShot(oreMining);
+                break;
+            case "picPickup":
+                audioSource.PlayOneShot(picPickup);
                 break;
 
             default:
