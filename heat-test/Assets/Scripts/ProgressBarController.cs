@@ -22,11 +22,16 @@ public class ProgressBarController : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+
+        Debug.Log($"ProgressBar Awake on {gameObject.name}");
     }
 
     void Start()
     {
+        Debug.Log($"Start Value = {startValue}");
+        Debug.Log($"Current Value BEFORE = {CurrentValue}");
         CurrentValue = startValue;
+        BarUpdate?.Invoke();
         UpdateBar();
     }
 
@@ -35,7 +40,7 @@ public class ProgressBarController : MonoBehaviour
         if (limitReachedIndicator != null)
             limitReachedIndicator.SetActive(CurrentValue >= maxValue);
 
-        valueText.SetText($"{CurrentValue.ToString("F0")}/{maxValue}");
+        valueText.SetText($"{CurrentValue.ToString("F0")}");
     }
 
     private void OnEnable()
