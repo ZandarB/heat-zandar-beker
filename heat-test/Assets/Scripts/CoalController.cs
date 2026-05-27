@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 
 public class CoalController : MonoBehaviour
@@ -7,14 +6,18 @@ public class CoalController : MonoBehaviour
 
     public static CoalController Instance;
 
-
     void Update()
     {
         if(totalCoal <= 0)
         {
+            AudioController.Instance.PlaySound("depleteOre");
             Debug.Log("0 Coal Left");
             Destroy(gameObject);
         }
     }
 
+    void Coal()
+    {
+        //Player picks up coal
+    }
 }
