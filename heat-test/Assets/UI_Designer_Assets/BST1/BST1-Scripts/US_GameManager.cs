@@ -130,7 +130,7 @@ public class US_GameManager : MonoBehaviour
     private float timer = 0f;
     private void Awake()
     {
-        countText.text = currentCount.ToString();
+        //countText.text = currentCount.ToString();
         fillChildRect = fireFillImage.transform.GetChild(0)
             .GetComponent<RectTransform>();
     }
@@ -143,7 +143,7 @@ public class US_GameManager : MonoBehaviour
         if (timer >= (1f / duration) && currentCount > 0)
         {
             currentCount--; // Decrement count
-            //countText.text = currentCount.ToString(); // Update text
+            countText.text = currentCount.ToString(); // Update text
             FireDiesOut(currentCount); // Update UI
             timer = 0f;     // Reset timer
 
