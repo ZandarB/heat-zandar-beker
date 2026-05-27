@@ -3,7 +3,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 public class PlayerController : MonoBehaviour
 {
     [Header("Player movement")]
@@ -45,6 +44,9 @@ public class PlayerController : MonoBehaviour
 
     public static PlayerController Instance;
 
+    Animator animator;
+    private Vector2 lastMoveDirection = new Vector2(0, -1); //This helps the animator decide what direction to use for the idle
+
     private void Awake()
     {
         if (Instance == null)
@@ -66,6 +68,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -147,7 +150,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //Camera Angles to offset the player movement based on camera angles so that w still means go up
+        // Camera-relative movement
         Vector3 camForward = Camera.main.transform.forward;
         Vector3 camRight = Camera.main.transform.right;
 
@@ -156,29 +159,45 @@ public class PlayerController : MonoBehaviour
         controller.Move(move * speed * Time.deltaTime);
 
 
-        //Jump logic
+        Vector2 input = moveInput;
+
+        //Only update facing direction when player is moving
+        if (input.sqrMagnitude > 0.01f)
+        {
+            Vector3 moveDir = camForward * input.y + camRight * input.x;
+
+            Vector2 animatorDirection = new Vector2(moveDir.x, moveDir.z);
+
+            if (animatorDirection.magnitude > 0.01f)
+            {
+                animatorDirection.Normalize();
+                lastMoveDirection = animatorDirection; //Remember last direction
+            }
+        }
+
+        //Use last known direction (for idle animation if not moving)
+        animator.SetFloat("MoveX", lastMoveDirection.x);
+        animator.SetFloat("MoveY", lastMoveDirection.y);
+
+        //Speed for idle/run switching
+        animator.SetFloat("Speed", moveInput.sqrMagnitude);
+
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
-        //Coal number
         coalCounterText.SetText($"{coalNum.ToString()}");
         saltCounterText.SetText($"{saltNum.ToString()}");
 
-
-        //Heat meter reduction
         if (velocity.y > 0.01f)
         {
-            //Jump makes it decrease faster
             progress.Decrease(Time.deltaTime * jumpHeatMod);
         }
         else if (moveInput.sqrMagnitude > 0.01f)
         {
-            // Decreases when player is moving
             progress.Decrease(Time.deltaTime * moveHeatMod);
         }
 
         updateLight();
-        
     }
 
 
@@ -199,7 +218,6 @@ public class PlayerController : MonoBehaviour
             minePrompt.SetActive(true);
             isInRange = true;
         }
-
 
         //Deposit coal in furnace, refill heat meter and upgrade meter max by how much coal is deposited
         if (other.gameObject.CompareTag("Furnace"))
@@ -234,7 +252,7 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-        PlayerController.Instance.gameObject.SetActive(false);
+        //PlayerController.Instance.gameObject.SetActive(false);
     }
 
     //Updates the light based on heat level. If gets to 0, dies.
