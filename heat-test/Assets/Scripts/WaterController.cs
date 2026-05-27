@@ -3,15 +3,17 @@ using UnityEngine;
 public class WaterController : MonoBehaviour
 {
     GameObject waterWarning;
+    private bool inWater = false;
     void Awake()
     {
         waterWarning = GameObject.FindWithTag("DamageWarning");
-        if (waterWarning == null)
-            Debug.LogError("No GameObject with tag 'WaterWarning' found!");
     }
     void Update()
     {
-        
+        if (inWater)
+        {
+            ProgressBarController.Instance.Decrease(Time.deltaTime * 2f);
+        }
     }
     void OnTriggerEnter(Collider other)
     {
@@ -19,7 +21,7 @@ public class WaterController : MonoBehaviour
         if(other.gameObject.CompareTag("Player"))
         {
             Debug.Log("Player hit water");
-            ProgressBarController.Instance.Decrease(Time.deltaTime * 2f);
+            inWater = true;
             waterWarning.SetActive(true);
         }
     }
@@ -27,6 +29,7 @@ public class WaterController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
+            inWater = false;
             waterWarning.SetActive(false);
         }
     }
