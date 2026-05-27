@@ -1,3 +1,5 @@
+using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class DeathPitController : MonoBehaviour
@@ -13,4 +15,13 @@ public class DeathPitController : MonoBehaviour
     {
         
     }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            collision.transform.position = new Vector3(4, 0, 4);
+        }
+    }
+
 }
