@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class ChangeShader : MonoBehaviour
 {
-    [SerializeField] private GameObject gameObject;
+    [SerializeField] private GameObject shaderObject;
     private Material mat;
     private Image image;
 

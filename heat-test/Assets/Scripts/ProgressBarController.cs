@@ -12,7 +12,7 @@ public class ProgressBarController : MonoBehaviour
     [SerializeField] GameObject limitReachedIndicator;
     [SerializeField] TextMeshProUGUI valueText;
 
-    public float CurrentValue { get; private set; }
+    public float currentValue;
     public event System.Action BarUpdate;
     public static ProgressBarController Instance;
 
@@ -26,16 +26,16 @@ public class ProgressBarController : MonoBehaviour
 
     void Start()
     {
-        CurrentValue = startValue;
+        currentValue = startValue;
         UpdateBar();
     }
 
     private void Update()
     {
         if (limitReachedIndicator != null)
-            limitReachedIndicator.SetActive(CurrentValue >= maxValue);
+            limitReachedIndicator.SetActive(currentValue >= maxValue);
 
-        valueText.SetText($"{CurrentValue.ToString("F0")}/{maxValue}");
+        valueText.SetText($"{currentValue.ToString("F0")}/{maxValue}");
     }
 
     private void OnEnable()
@@ -49,36 +49,57 @@ public class ProgressBarController : MonoBehaviour
     }
 
     // Add to the current value (e.g. elapsed time, XP gained, items collected)
-    public void Increase(float amount)
+    public int Increase(float amount)
     {
-        CurrentValue += amount;
+        float overflow = 0f;
+
+        if (currentValue + amount > maxValue)
+        {
+            overflow = (currentValue + amount) - maxValue;
+            currentValue = maxValue;
+        }
+        else
+        {
+            currentValue += amount;
+        }
+
+        BarUpdate?.Invoke();
+
+        return Mathf.RoundToInt(overflow);
+    }
+
+    public void IncreaseMax(float amount)
+    {
+        maxValue += amount;
+        currentValue = maxValue;
+
         BarUpdate?.Invoke();
     }
 
     // Subtract from the current value
     public void Decrease(float amount)
     {
-        CurrentValue -= amount;
-        CurrentValue = Mathf.Max(0, CurrentValue);
+        currentValue -= amount;
+        currentValue = Mathf.Max(0, currentValue);
         BarUpdate?.Invoke();
     }
 
     // Directly set the current value (useful for timers driven by Time.deltaTime)
     public void SetValue(float value)
     {
-        CurrentValue = Mathf.Clamp(value, 0, maxValue);
+        currentValue = Mathf.Clamp(value, 0, maxValue);
         BarUpdate?.Invoke();
     }
 
     // Reset back to the start value
     public void ResetBar()
     {
-        CurrentValue = maxValue;
+        currentValue = maxValue;
         BarUpdate?.Invoke();
     }
 
     private void UpdateBar()
     {
-        progressBar.fillAmount = Mathf.Clamp01(CurrentValue / maxValue);
+        progressBar.fillAmount = Mathf.Clamp01(currentValue / maxValue);
     }
 }

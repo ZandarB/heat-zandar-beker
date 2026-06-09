@@ -153,7 +153,7 @@ public class US_GameManager : MonoBehaviour
 
     private void UpdateFireUI()
     {
-        float currentValue = progressBar.CurrentValue;
+        float currentValue = progressBar.currentValue;
 
         countText.text = currentValue.ToString("F0");
 

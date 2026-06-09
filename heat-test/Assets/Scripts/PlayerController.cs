@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
 
-        Debug.Log($"Current Heat: {progress.CurrentValue}");
+        Debug.Log($"Current Heat: {progress.currentValue}");
         Debug.Log($"Max Heat: {progress.maxValue}");
         Debug.Log($"Light Intensity: {flame.intensity}");
         animator = GetComponent<Animator>();
@@ -146,7 +146,7 @@ public class PlayerController : MonoBehaviour
             if (coalNum > 0)
             {
                 AudioController.Instance.PlaySound("furnaceEnter");
-                progress.Increase(coalNum);
+                progress.currentValue += coalNum;
                 coalNum = 0f;
             }
         }
@@ -246,8 +246,10 @@ public class PlayerController : MonoBehaviour
             if (coalNum > 0)
             {
                 AudioController.Instance.PlaySound("skillTreeOpen");
-                progress.Increase(coalNum);
-                coalNum = 0f;
+
+                int coalOverflow = progress.Increase(coalNum);
+
+                coalNum = coalOverflow;
             }
         }
 
@@ -296,14 +298,19 @@ public class PlayerController : MonoBehaviour
     //Updates the light based on heat level. If gets to 0, dies.
     void updateLight()
     {
-        flame.intensity = (progress.CurrentValue / progress.maxValue) * 50;
-        flame.range = (progress.CurrentValue / progress.maxValue) * 50;
+        flame.intensity = (progress.currentValue / progress.maxValue) * 50;
+        flame.range = (progress.currentValue / progress.maxValue) * 50;
 
 
         if (flame.intensity <= 0)
         {
             Die();
         }
+    }
+
+    public ProgressBarController getProgress()
+    {
+        return progress;
     }
 
 }
