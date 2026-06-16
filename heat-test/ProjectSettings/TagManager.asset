@@ -11,6 +11,7 @@ TagManager:
   - CavernsArea
   - Water
   - DamageWarning
+  - BreakableWall
   layers:
   - Default
   - TransparentFX

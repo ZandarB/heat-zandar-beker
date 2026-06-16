@@ -40,6 +40,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public GameObject redWarning;
     [SerializeField] public Light flame;
     bool isInRange = false;
+    public bool gameHasStarted = false;
+
+    [SerializeField] GameObject drillingMinigame;
 
     private Collider currentInteractable;
 
@@ -150,6 +153,11 @@ public class PlayerController : MonoBehaviour
                 coalNum = 0f;
             }
         }
+
+        else if (currentInteractable.CompareTag("BreakableWall") && hasDrill)
+        {
+            drillingMinigame.SetActive(true);
+        }
     }
 
     public void PickUpDrill()
@@ -253,6 +261,13 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        if (other.CompareTag("BreakableWall") && hasDrill)
+        {
+            currentInteractable = other;
+            minePrompt.SetActive(true);
+            isInRange = true;
+        }
+
         // Furnace room ambience
         if (other.gameObject.CompareTag("FurnaceRoom"))
         {
@@ -287,6 +302,11 @@ public class PlayerController : MonoBehaviour
             minePrompt.SetActive(false);
             isInRange = false;
 
+        }
+        if (other.gameObject.CompareTag("BreakableWall") && hasDrill)
+        {
+            minePrompt.SetActive(false);
+            isInRange = false;
         }
     }
 
