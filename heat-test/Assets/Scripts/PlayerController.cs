@@ -38,21 +38,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public GameObject pick;
     [SerializeField] public GameObject redWarning;
     [SerializeField] public Light flame;
+    [SerializeField] GameObject drillingMinigame;
+    [SerializeField] public GameObject gameUI;
+
     bool isInRange = false;
     public bool gameHasStarted = false;
-
-    [SerializeField] GameObject drillingMinigame;
-
     private Collider currentInteractable;
-
     private CharacterController controller;
     private Vector3 moveInput;
     private Vector3 velocity;
     public bool allowedToMove = true;
-
     public static PlayerController Instance;
-
     Animator animator;
+
+
     private Vector2 lastMoveDirection = new Vector2(0, -1); //This helps the animator decide what direction to use for the idle
 
     private void Awake()
@@ -161,7 +160,7 @@ public class PlayerController : MonoBehaviour
 
             DrillMinigame minigame = drillingMinigame.GetComponent<DrillMinigame>();
             minigame.AssignWall(currentInteractable.gameObject);
-
+            gameUI.SetActive(false);
             drillingMinigame.SetActive(true);
             minePrompt.SetActive(false);
         }
@@ -183,6 +182,16 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+        if (!allowedToMove)
+        {
+            moveInput = Vector2.zero;
+            controller.Move(Vector3.zero);
+            animator.SetFloat("Speed", 0);
+            velocity.x = 0;
+            velocity.z = 0;
+        }
+
         // Camera-relative movement
         Vector3 camForward = Camera.main.transform.forward;
         Vector3 camRight = Camera.main.transform.right;

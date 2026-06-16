@@ -36,6 +36,8 @@ public class DrillMinigame : MonoBehaviour
         hitsRequired = Random.Range(1, 5);
         currentHits = 0;
 
+        text.text = $"Hits Remaining: {hitsRequired - currentHits}";
+
         ResetGame();
     }
 
@@ -53,7 +55,6 @@ public class DrillMinigame : MonoBehaviour
                 if (timer <= 0f)
                 {
                     state = GameState.Running;
-                    text.text = "";
                 }
                 break;
 
@@ -72,12 +73,14 @@ public class DrillMinigame : MonoBehaviour
 
     private void ResetGame()
     {
-        Debug.Log(currentHits);
+        text.text = $"Hits Remaining: {hitsRequired - currentHits}";
         if (currentHits >= hitsRequired)
         {
             Destroy(targetWall);
             PlayerController.Instance.gameHasStarted = false;
             PlayerController.Instance.allowedToMove = true;
+            PlayerController.Instance.gameUI.SetActive(true);
+
             gameObject.SetActive(false);
             return;
         }
