@@ -2,30 +2,14 @@ using UnityEngine;
 
 public class WallBreakController : MonoBehaviour
 {
+    [SerializeField] private int hitsRequired = 1;
     [SerializeField] PlayerController playerController;
 
-    [SerializeField] private int hitsRequired = 3;
+    private int currentHits = 0;
 
-    private int currentHits;
-
-    public int GetHitsRequired() => hitsRequired;
-
-    public bool HitWall()
-    {
-        currentHits++;
-
-        if (currentHits >= hitsRequired)
-        {
-            Destroy(gameObject);
-            return true;
-        }
-
-        return false;
-    }
     private void BreakWall()
     {
         playerController.gameHasStarted = false;
         Destroy(gameObject);
     }
 }
-

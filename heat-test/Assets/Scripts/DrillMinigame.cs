@@ -8,103 +8,82 @@ public class DrillMinigame : MonoBehaviour
 
     public enum GameState { Idle, Waiting, Running, Result }
 
+    [SerializeField] RectTransform playingArea;
+    [SerializeField] RectTransform player;
+    [SerializeField] RectTransform winArea;
+    [SerializeField] TextMeshProUGUI text;
+
+    public GameObject targetWall;
+
+    public Vector2 zoneCenterClamp = new Vector2(0.15f, 0.85f);
+    public Vector2 zoneSizeRange = new Vector2(0.18f, 0.32f);
+
+    float t;
+    int dir = 1;
+    float speed = 1.5f;
+    float timer = 1f;
+
+    
+
     private GameState state = GameState.Idle;
 
+    int hitsRequired;
+    int currentHits;
 
-
-    private int remainingHits;
-
-    private float timer;
-    private float t;
-    private int dir = 1;
 
     private void OnEnable()
     {
-        Reset();
+        hitsRequired = Random.Range(1, 5);
+        currentHits = 0;
+
+        ResetGame();
+    }
+
+    public void AssignWall(GameObject target)
+    {
+        targetWall = target;
     }
 
     private void Update()
     {
-        if (state != GameState.Running) return;
+        switch (state)
+        {
+            case GameState.Waiting:
+                timer -= Time.deltaTime;
+                if (timer <= 0f)
+                {
+                    state = GameState.Running;
+                    text.text = "";
+                }
+                break;
 
-        UpdateMarker();
+            case GameState.Running:
+                UpdateMarker();
+                break;
+        }
     }
-
-    // ================= START =================
-    public void StartDrilling(WallBreakController wall)
+    public void OnExternalInteract()
     {
-        state = GameState.Running;
+        Debug.Log("Minigame input");
 
-        currentWall = wall;
-
-        remainingHits = wall.GetHitsRequired();
-
-        canvas.SetActive(true);
-
-        resultText.text = $"Break the wall! ({remainingHits})";
-
-        ResetRun();
-
-        state = GameState.Waiting;
-    }
-
-    // ================= INPUT =================
-    private void OnInteract(InputAction.CallbackContext ctx)
-    {
         if (state == GameState.Running)
             Evaluate();
     }
 
-    // ================= CORE LOOP =================
-    private void Evaluate()
+    private void ResetGame()
     {
-        state = GameState.Result;
-
-        bool success = IsMarkerInsideZone();
-
-        if (success)
+        Debug.Log(currentHits);
+        if (currentHits >= hitsRequired)
         {
-            remainingHits--;
-
-            if (remainingHits <= 0)
-            {
-                resultText.text = "Wall Broken!";
-
-                currentWall.HitWall();
-
-                Invoke(nameof(CloseMinigame), 1f);
-                return;
-            }
-
-            resultText.text = $"Hit! ({remainingHits})";
-
-            Invoke(nameof(NextHit), 0.5f);
+            Destroy(targetWall);
+            PlayerController.Instance.gameHasStarted = false;
+            PlayerController.Instance.allowedToMove = true;
+            gameObject.SetActive(false);
+            return;
         }
-        else
-        {
-            resultText.text = "Miss!";
 
-            Invoke(nameof(NextHit), 0.5f);
-        }
-    }
-
-    private void NextHit()
-    {
-        ResetRun();
+        timer = 1f;
         state = GameState.Waiting;
-    }
-
-    private void CloseMinigame()
-    {
-        currentWall = null;
-        state = GameState.Idle;
-        canvas.SetActive(false);
-    }
-
-    // ================= RUN SETUP =================
-    private void ResetRun()
-    {
-        timer = Random.Range(hitRange.x, hitRange.y);
 
         RandomizeZone();
         ResetMarker();
@@ -118,7 +97,6 @@ public class DrillMinigame : MonoBehaviour
         ApplyMarkerPosition();
     }
 
-    // ================= MOVEMENT =================
     private void UpdateMarker()
     {
         t += dir * speed * Time.deltaTime;
@@ -133,46 +111,57 @@ public class DrillMinigame : MonoBehaviour
     {
         float y = Mathf.Lerp(GetBottom(), GetTop(), t);
 
-        Vector2 pos = marker.anchoredPosition;
+        Vector2 pos = player.anchoredPosition;
         pos.y = y;
-        marker.anchoredPosition = pos;
+        player.anchoredPosition = pos;
     }
-
-    // ================= ZONE =================
     private void RandomizeZone()
     {
-        float height = gameArea.rect.height;
+        if (!playingArea || !winArea) return;
 
-        float zoneHeight =
-            Random.Range(zoneSizeRange.x, zoneSizeRange.y) * height;
+        float trackH = playingArea.rect.height;
+        float zoneFrac = Random.Range(zoneSizeRange.x, zoneSizeRange.y);
+        float zoneH = Mathf.Clamp(zoneFrac, 0.05f, 0.9f) * trackH;
 
-        Vector2 size = successArea.sizeDelta;
-        size.y = zoneHeight;
-        successArea.sizeDelta = size;
+        float minCenter = Mathf.Lerp(GetBottom(), GetTop(), zoneCenterClamp.x);
+        float maxCenter = Mathf.Lerp(GetBottom(), GetTop(), zoneCenterClamp.y);
+        float centerY = Random.Range(minCenter, maxCenter);
 
-        float min = Mathf.Lerp(GetBottom(), GetTop(), zoneCenterClamp.x);
-        float max = Mathf.Lerp(GetBottom(), GetTop(), zoneCenterClamp.y);
+        var size = winArea.sizeDelta; size.y = zoneH; winArea.sizeDelta = size;
 
-        float center = Random.Range(min, max);
-
-        Vector2 pos = successArea.anchoredPosition;
-        pos.y = Mathf.Clamp(center,
-            GetBottom() + zoneHeight * 0.5f,
-            GetTop() - zoneHeight * 0.5f);
-
-        successArea.anchoredPosition = pos;
+        var pos = winArea.anchoredPosition;
+        pos.y = Mathf.Clamp(centerY, GetBottom() + zoneH * 0.5f, GetTop() - zoneH * 0.5f);
+        winArea.anchoredPosition = pos;
     }
+
 
     private bool IsMarkerInsideZone()
     {
-        float markerY = marker.anchoredPosition.y;
+        float markerY = player.anchoredPosition.y;
 
-        float half = successArea.rect.height * 0.5f;
-        float center = successArea.anchoredPosition.y;
+        float half = winArea.rect.height * 0.5f;
+        float center = winArea.anchoredPosition.y;
 
         return markerY >= center - half && markerY <= center + half;
     }
 
-    private float GetBottom() => -gameArea.rect.height * 0.5f;
-    private float GetTop() => gameArea.rect.height * 0.5f;
+    private void Evaluate()
+    {
+        state = GameState.Result;
+
+        bool success = IsMarkerInsideZone();
+        if (success)
+        {
+            currentHits++;
+            ResetGame();
+        }
+        else
+        {
+            currentHits = 0;
+            ResetGame();
+        }
+    }
+
+    private float GetBottom() => -playingArea.rect.height * 0.5f;
+    private float GetTop() => playingArea.rect.height * 0.5f;
 }

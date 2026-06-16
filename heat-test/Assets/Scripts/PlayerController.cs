@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] public TextMeshProUGUI saltCounterText;
     [SerializeField] public float saltIncrement = 10f;
-    [SerializeField] SaltController saltController;
     public float saltNum = 0f;
 
     [SerializeField] public TextMeshProUGUI pickText;
@@ -49,6 +48,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
     private Vector3 moveInput;
     private Vector3 velocity;
+    public bool allowedToMove = true;
 
     public static PlayerController Instance;
 
@@ -78,40 +78,40 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-
-        Debug.Log($"Current Heat: {progress.currentValue}");
-        Debug.Log($"Max Heat: {progress.maxValue}");
-        Debug.Log($"Light Intensity: {flame.intensity}");
         animator = GetComponent<Animator>();
     }
 
-    public void OnMove(InputAction.CallbackContext context)
+    public void OnMove(InputValue value)
     {
-        moveInput = context.ReadValue<Vector2>();
-        //Debug.Log($"Move input: {moveInput}");
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        //Debug.Log($"Jumping: {context.performed} - Is Grounded: {controller.isGrounded}");
-        if (context.performed && controller.isGrounded)
+        if (allowedToMove)
         {
-            AudioController.Instance.PlaySound("playerJump");
+            moveInput = value.Get<Vector2>();
 
-            Debug.Log("Jumped!");
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
     }
 
-    public void OnInteract(InputAction.CallbackContext context)
+    public void OnJump(InputValue value)
     {
-        Debug.Log("Interact pressed");
-        Debug.Log("Hit Interact Button");
+        if (!value.isPressed || !controller.isGrounded || !allowedToMove)
+            return;
 
-        if (!context.performed) return;
+        AudioController.Instance.PlaySound("playerJump");
+
+        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+    }
+
+    public void OnInteract(InputValue value)
+    {
+        if (!value.isPressed) return;
 
         if (currentInteractable == null)
         {
+            return;
+        }
+
+        if (gameHasStarted && drillingMinigame.activeInHierarchy)
+        {
+            drillingMinigame.GetComponent<DrillMinigame>().OnExternalInteract();
             return;
         }
 
@@ -154,9 +154,16 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        else if (currentInteractable.CompareTag("BreakableWall") && hasDrill)
+        else if (currentInteractable.CompareTag("BreakableWall") && hasDrill && !gameHasStarted)
         {
+            gameHasStarted = true;
+            allowedToMove = false;
+
+            DrillMinigame minigame = drillingMinigame.GetComponent<DrillMinigame>();
+            minigame.AssignWall(currentInteractable.gameObject);
+
             drillingMinigame.SetActive(true);
+            minePrompt.SetActive(false);
         }
     }
 
@@ -165,7 +172,6 @@ public class PlayerController : MonoBehaviour
         hasDrill = true;
         drill.SetActive(true);
         drillText.text = "Drill!";
-        Debug.Log("Drill is true");
     }
 
     public void PickUpPick()
@@ -274,7 +280,6 @@ public class PlayerController : MonoBehaviour
             AudioController.Instance.StopSound("cavernsArea");
             AudioController.Instance.PlaySound("furnaceRoom");
 
-            Debug.Log("Furnace room collider works");
         }
 
         // Cavern ambience
@@ -283,7 +288,6 @@ public class PlayerController : MonoBehaviour
             AudioController.Instance.StopSound("furnaceRoom");
             AudioController.Instance.PlaySound("cavernsArea");
 
-            Debug.Log("Caverns room collider works");
         }
     }
 

@@ -21446,7 +21446,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &344428305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21542,16 +21542,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3651f35dde5bb8642a16b913bc2ab675, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DrillMinigame
-  canvas: {fileID: 1831470544}
-  gameArea: {fileID: 124162347}
-  successArea: {fileID: 972635724}
-  marker: {fileID: 836811565}
-  resultText: {fileID: 928843382}
-  speed: 1.5
-  hitRange: {x: 0.75, y: 1.75}
-  zoneSizeRange: {x: 0.18, y: 0.32}
+  playingArea: {fileID: 124162347}
+  player: {fileID: 836811565}
+  winArea: {fileID: 972635724}
+  text: {fileID: 928843382}
+  targetWall: {fileID: 0}
   zoneCenterClamp: {x: 0.15, y: 0.85}
-  interactAction: {fileID: -2280831921897493606, guid: 70ebffbf4f9dfb641bc7731065a458eb, type: 3}
+  zoneSizeRange: {x: 0.18, y: 0.32}
 --- !u!4 &345567798 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1766097863132932102, guid: 93fe0d4835174ea4e85e9848c6b9a4da, type: 3}
@@ -72373,7 +72370,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6760158451910166407, guid: edc0bfb9707484146bc22a1289fbefc4, type: 3}
   m_PrefabInstance: {fileID: 1869165249}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1831470544}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11689a84a2191584495bb51c6bcd5a94, type: 3}
@@ -113399,11 +113396,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0888c9f151be5b9499b22b2bcdd7d20a, type: 3}
---- !u!1 &1831470544 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5439036981609602758, guid: edc0bfb9707484146bc22a1289fbefc4, type: 3}
-  m_PrefabInstance: {fileID: 1869165249}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1831802567 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3380235908727436649, guid: 0888c9f151be5b9499b22b2bcdd7d20a, type: 3}
@@ -115250,6 +115242,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5535121567860909988, guid: edc0bfb9707484146bc22a1289fbefc4, type: 3}
+      propertyPath: m_NotificationBehavior
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5535121567860909988, guid: edc0bfb9707484146bc22a1289fbefc4, type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_ActionId
       value: fdfa98ee-88bc-45c8-bda3-3e3cce4e0567
       objectReference: {fileID: 0}
@@ -115294,6 +115290,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1615768825}
     - target: {fileID: 6760158451910166407, guid: edc0bfb9707484146bc22a1289fbefc4, type: 3}
+      propertyPath: redWarning
+      value: 
+      objectReference: {fileID: 1108311021}
+    - target: {fileID: 6760158451910166407, guid: edc0bfb9707484146bc22a1289fbefc4, type: 3}
       propertyPath: coalCounterText
       value: 
       objectReference: {fileID: 1401283238}
@@ -115301,6 +115301,10 @@ PrefabInstance:
       propertyPath: saltCounterText
       value: 
       objectReference: {fileID: 89198813}
+    - target: {fileID: 6760158451910166407, guid: edc0bfb9707484146bc22a1289fbefc4, type: 3}
+      propertyPath: drillingMinigame
+      value: 
+      objectReference: {fileID: 344428304}
     - target: {fileID: 7507627529788755909, guid: edc0bfb9707484146bc22a1289fbefc4, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.86742
